@@ -17,7 +17,7 @@ DESCRIPTION = 'An elegant RESTful client based on requests.'
 URL = 'https://github.com/xiyusullos/requests-rest'
 EMAIL = 'i@aponder.top'
 AUTHOR = 'aponder'
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

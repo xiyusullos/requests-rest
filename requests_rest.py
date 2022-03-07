@@ -178,9 +178,9 @@ class Resource(object):
     @property
     def response(self):
         p = self.request_parameter
-        url = f'{self.client.base_url.rstrip("/")}/{p.url}'.rstrip('/')
         if self.client.debug:
-            s = f'{p.method} {url}'
+            full_url = f'{self.client.base_url.rstrip("/")}/{p.url}'.rstrip('/')
+            s = f'{p.method} {full_url}'
             if p.query_string:
                 s += f'?{p.query_string}'
             if p.data:
@@ -188,7 +188,7 @@ class Resource(object):
             print(s)
 
         return self.client.session.request(
-            p.method, url,
+            p.method, p.url,
             params=p.params, data=p.data, headers=p.headers, cookies=p.cookies, files=p.files,
             auth=p.auth, timeout=p.timeout, allow_redirects=p.allow_redirects, proxies=p.proxies,
             hooks=p.hooks, stream=p.stream, verify=p.verify, cert=p.cert, json=p.json
