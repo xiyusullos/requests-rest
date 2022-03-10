@@ -92,13 +92,13 @@ class Resource(object):
     def base_url_path(self):
         return self.resource_path.rstrip('/')
 
-    def copy(self):
+    def _copy(self):
         return Resource(self.resource_path, self.client, self.parent_resource)
 
-    def prepare(self, method, url,
-                params=None, data=None, headers=None, cookies=None, files=None,
-                auth=None, timeout=None, allow_redirects=True, proxies=None,
-                hooks=None, stream=None, verify=None, cert=None, json=None):
+    def _prepare(self, method, url,
+                 params=None, data=None, headers=None, cookies=None, files=None,
+                 auth=None, timeout=None, allow_redirects=True, proxies=None,
+                 hooks=None, stream=None, verify=None, cert=None, json=None):
         self.request_parameter = RequestParameter(method, url, params=params, data=data, headers=headers,
                                                   cookies=cookies, files=files, auth=auth, timeout=timeout,
                                                   allow_redirects=allow_redirects, proxies=proxies,
@@ -115,7 +115,7 @@ class Resource(object):
             url += '/'
 
         def action(data=None, **kwargs):
-            return self.copy().prepare(method, url, data=data, **kwargs)
+            return self._copy()._prepare(method, url, data=data, **kwargs)
 
         action.__name__ = action_name
 
@@ -129,7 +129,7 @@ class Resource(object):
             if self.client.use_tail_slash:
                 url += '/'
 
-            return self.copy().prepare(method, url, data=data, **kwargs)
+            return self._copy()._prepare(method, url, data=data, **kwargs)
 
         action.__name__ = action_name
 
@@ -141,7 +141,7 @@ class Resource(object):
         url = self.base_url_path
         if self.client.use_tail_slash:
             url += '/'
-        return self.copy().prepare(method, url, params=kwargs)
+        return self._copy()._prepare(method, url, params=kwargs)
 
     def create(self, data=None, **kwargs):
         '''POST /xxx/'''
@@ -149,31 +149,31 @@ class Resource(object):
         url = self.base_url_path
         if self.client.use_tail_slash:
             url += '/'
-        return self.copy().prepare(method, url, data=data, **kwargs)
+        return self._copy()._prepare(method, url, data=data, **kwargs)
 
     def detail(self, id, **kwargs):
         '''GET /xxx/:id'''
         method = GET
         url = f'{self.base_url_path}/{id}'
-        return self.copy().prepare(method, url, **kwargs)
+        return self._copy()._prepare(method, url, **kwargs)
 
     def update(self, id, data=None, **kwargs):
         '''PUT /xxx/:id'''
         method = PUT
         url = f'{self.base_url_path}/{id}'
-        return self.copy().prepare(method, url, data=data, **kwargs)
+        return self._copy()._prepare(method, url, data=data, **kwargs)
 
     def partial_update(self, id, data=None, **kwargs):
         '''PATCH /xxx/:id'''
         method = PATCH
         url = f'{self.base_url_path}/{id}'
-        return self.copy().prepare(method, url, data=data, **kwargs)
+        return self._copy()._prepare(method, url, data=data, **kwargs)
 
     def delete(self, id, **kwargs):
         '''DELETE /xxx/:id'''
         method = DELETE
         url = f'{self.base_url_path}/{id}'
-        return self.copy().prepare(method, url, **kwargs)
+        return self._copy()._prepare(method, url, **kwargs)
 
     @property
     def response(self):
@@ -250,6 +250,11 @@ if __name__ == '__main__':
 
     Users.disable = Users.make_single_action('disable')
     print(Users.disable(2).response)
+
+    Users.copy = Users.make_single_action('copy')
+    print(Users.copy(2).response)
+    Users.prepare = Users.make_single_action('prepare')
+    print(Users.prepare(2).response)
 
     # resource combination
     Blogs = resource_client('blogs')
